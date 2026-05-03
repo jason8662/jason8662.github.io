@@ -118,9 +118,9 @@ footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify
   </div>
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterGallery('all',this)">All</button>
-    <button class="filter-btn" onclick="filterGallery('Long-exposure',this)">Long Exposure</button>
     <button class="filter-btn" onclick="filterGallery('Macro',this)">Macro</button>
     <button class="filter-btn" onclick="filterGallery('Travel',this)">Travel</button>
+    <button class="filter-btn" onclick="filterGallery('Long-exposure',this)">Long Exposure</button>
   </div>
   <div class="photo-grid" id="grid"></div>
   <footer>
@@ -170,9 +170,12 @@ let lbIdx=0;
 let visible=[];
 
 function buildGrid(filter){
+  const order=['Macro','Travel','Long-exposure'];
   const grid=document.getElementById('grid');
   grid.innerHTML='';
-  visible=photos.filter(p=>filter==='all'||p.cat.toLowerCase()===filter.toLowerCase());
+  visible=photos
+    .filter(p=>filter==='all'||p.cat.toLowerCase()===filter.toLowerCase())
+    .sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   visible.forEach((p,i)=>{
     const div=document.createElement('div');
     div.className='photo-item';
