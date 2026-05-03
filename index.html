@@ -48,8 +48,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .filter-btn:hover,.filter-btn.active{color:var(--accent)}
 
 /* UNIFORM GRID */
-.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:2rem 6rem}
-@media(max-width:768px){.photo-grid{grid-template-columns:repeat(2,1fr);padding:1.5rem 2rem}}
+.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:2rem 8rem}
+@media(max-width:1024px){.photo-grid{grid-template-columns:repeat(3,1fr);padding:1.5rem 4rem}}
+@media(max-width:768px){.photo-grid{grid-template-columns:repeat(2,1fr);padding:1rem 2rem}}
 @media(max-width:480px){.photo-grid{grid-template-columns:1fr;padding:1rem}}
 @media(max-width:768px){.photo-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.photo-grid{grid-template-columns:1fr}}
@@ -149,7 +150,7 @@ async function loadFromCloudinary(){
     const res=await fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/portfolio.json`);
     const data=await res.json();
     photos=data.resources.map(r=>({
-      src:`https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_1200,q_auto,f_auto/${r.public_id}`,
+      src:`https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_800,q_auto,f_auto/${r.public_id}`,
       cat:r.asset_folder||'',
       label:r.public_id.split('/').pop().split('_').slice(0,2).join(' ')
     }));
@@ -167,7 +168,7 @@ let visible=[];
 function buildGrid(filter){
   const grid=document.getElementById('grid');
   grid.innerHTML='';
-  visible=photos.filter(p=>filter==='all'||p.cat===filter);
+  visible=photos.filter(p=>filter==='all'||p.cat.toLowerCase()===filter.toLowerCase());
   visible.forEach((p,i)=>{
     const div=document.createElement('div');
     div.className='photo-item';
