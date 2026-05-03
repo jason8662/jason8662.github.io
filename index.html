@@ -116,9 +116,9 @@ footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify
   </div>
   <div class="filter-bar">
     <button class="filter-btn active" onclick="filterGallery('all',this)">All</button>
-    <button class="filter-btn" onclick="filterGallery('landscape',this)">Landscape</button>
-    <button class="filter-btn" onclick="filterGallery('portrait',this)">Portrait</button>
-    <button class="filter-btn" onclick="filterGallery('street',this)">Street</button>
+    <button class="filter-btn" onclick="filterGallery('Long-exposure',this)">Long Exposure</button>
+    <button class="filter-btn" onclick="filterGallery('Macro',this)">Macro</button>
+    <button class="filter-btn" onclick="filterGallery('Travel',this)">Travel</button>
   </div>
   <div class="photo-grid" id="grid"></div>
   <footer>
@@ -140,17 +140,25 @@ footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify
 </div>
 
 <script>
-const photos=[
-  {src:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',cat:'landscape',label:'mountain fog'},
-  {src:'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80',cat:'portrait',label:'dusk light'},
-  {src:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',cat:'street',label:'city night'},
-  {src:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80',cat:'landscape',label:'pine ridge'},
-  {src:'https://images.unsplash.com/photo-1520637836862-4d197d17c35a?w=800&q=80',cat:'portrait',label:'shadow study'},
-  {src:'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80',cat:'street',label:'underground'},
-  {src:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80',cat:'landscape',label:'aerial coast'},
-  {src:'https://images.unsplash.com/photo-1534330207526-8e81f10ec6fc?w=800&q=80',cat:'portrait',label:'still'},
-  {src:'https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=800&q=80',cat:'street',label:'rainy avenue'},
-];
+const CLOUD_NAME='dok3udza0';
+const API_KEY='123749886413691';
+let photos=[];
+
+async function loadFromCloudinary(){
+  try{
+    const res=await fetch(`https://res.cloudinary.com/${CLOUD_NAME}/image/list/portfolio.json`);
+    const data=await res.json();
+    photos=data.resources.map(r=>({
+      src:`https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_1200,q_auto,f_auto/${r.public_id}`,
+      cat:r.folder||'all',
+      label:r.public_id.split('/').pop().replace(/_/g,' ')
+    }));
+  }catch(e){
+    console.warn('Cloudinary load failed, using fallback');
+    photos=[];
+  }
+  buildGrid(currentFilter);
+}
 
 let currentFilter='all';
 let lbIdx=0;
@@ -223,6 +231,7 @@ document.addEventListener('keydown',e=>{
 });
 
 setTimeout(()=>document.querySelector('#home .fade-in-el').classList.add('visible'),200);
+loadFromCloudinary();
 </script>
 </body>
 </html>
