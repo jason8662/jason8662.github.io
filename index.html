@@ -150,11 +150,11 @@ async function loadFromCloudinary(){
     const data=await res.json();
     photos=data.resources.map(r=>({
       src:`https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_1200,q_auto,f_auto/${r.public_id}`,
-      cat:r.folder||'all',
-      label:r.public_id.split('/').pop().replace(/_/g,' ')
+      cat:r.asset_folder||'',
+      label:r.public_id.split('/').pop().split('_').slice(0,2).join(' ')
     }));
   }catch(e){
-    console.warn('Cloudinary load failed, using fallback');
+    console.warn('Cloudinary load failed');
     photos=[];
   }
   buildGrid(currentFilter);
