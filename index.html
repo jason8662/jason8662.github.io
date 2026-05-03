@@ -48,10 +48,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .filter-btn:hover,.filter-btn.active{color:var(--accent)}
 
 /* UNIFORM GRID */
-.photo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:2rem 8rem}
-@media(max-width:1024px){.photo-grid{grid-template-columns:repeat(3,1fr);padding:1.5rem 4rem}}
-@media(max-width:768px){.photo-grid{grid-template-columns:repeat(2,1fr);padding:1rem 2rem}}
-@media(max-width:480px){.photo-grid{grid-template-columns:1fr;padding:1rem}}
+.photo-grid{columns:4;gap:12px;padding:2rem 8rem;column-gap:12px}
+@media(max-width:1024px){.photo-grid{columns:3;padding:1.5rem 4rem}}
+@media(max-width:768px){.photo-grid{columns:2;padding:1rem 2rem}}
+@media(max-width:480px){.photo-grid{columns:1;padding:1rem}}
+.photo-item{break-inside:avoid;margin-bottom:12px;display:block}
 @media(max-width:768px){.photo-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:480px){.photo-grid{grid-template-columns:1fr}}
 
@@ -152,8 +153,11 @@ async function loadFromCloudinary(){
     photos=data.resources.map(r=>({
       src:`https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_800,q_auto,f_auto/${r.public_id}`,
       cat:r.asset_folder||'',
-      label:r.public_id.split('/').pop().split('_').slice(0,2).join(' ')
+      label:r.public_id.split('/').pop().split('_').slice(0,2).join(' '),
+      ratio:r.width/r.height
     }));
+    const order=['Macro','Travel','Long-exposure'];
+    photos.sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat));
   }catch(e){
     console.warn('Cloudinary load failed');
     photos=[];
