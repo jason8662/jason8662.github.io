@@ -75,7 +75,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .lb-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:0.65rem;letter-spacing:0.25em;color:var(--muted)}
 
 /* CONTACT POPUP */
-.contact-popup{position:fixed;bottom:5rem;left:3rem;background:#161616;border:1px solid var(--border);padding:1.5rem 2rem;z-index:300;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity 0.3s ease,transform 0.3s ease}
+.contact-popup{position:fixed;bottom:4rem;right:3rem;left:auto;background:#161616;border:1px solid var(--border);padding:1.5rem 2rem;z-index:300;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity 0.3s ease,transform 0.3s ease}
 .contact-popup.open{opacity:1;pointer-events:all;transform:translateY(0)}
 .contact-popup p{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem}
 .contact-popup a{font-size:0.85rem;color:var(--text);text-decoration:none;letter-spacing:0.05em;transition:color 0.3s}
@@ -123,7 +123,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
   <footer>
     <div class="footer-links">
       <a href="https://www.instagram.com/jungssup/" target="_blank">Instagram</a>
-      <a onclick="toggleContact()" style="cursor:pointer">Contact</a>
+      <a onclick="event.stopPropagation();toggleContact()" style="cursor:pointer">Contact</a>
     </div>
     <span class="footer-copy">&copy; 2026</span>
   </footer>
