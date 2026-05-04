@@ -163,7 +163,7 @@ const observer=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
 },{threshold:0.1,rootMargin:'0px 0px -40px 0px'});
 
-function buildGrid(filter){
+function buildGrid(filter, instant=false){
   const order=['Macro','Travel','Long-exposure'];
   const grid=document.getElementById('grid');
   grid.innerHTML='';
@@ -173,6 +173,7 @@ function buildGrid(filter){
   visible.forEach((p,i)=>{
     const div=document.createElement('div');
     div.className='photo-item';
+    if(instant) div.classList.add('visible');
     const img=document.createElement('img');
     img.alt=p.label;
     img.onload=()=>img.classList.add('loaded');
@@ -185,7 +186,7 @@ function buildGrid(filter){
     div.onclick=()=>openLb(i);
     visible[i]._el=div;
     grid.appendChild(div);
-    observer.observe(div);
+    if(!instant) observer.observe(div);
   });
 }
 
@@ -193,7 +194,7 @@ function filterGallery(cat,btn){
   currentFilter=cat;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  buildGrid(cat);
+  buildGrid(cat, true);
 }
 
 function openLb(i){
