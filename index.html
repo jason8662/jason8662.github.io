@@ -74,7 +74,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .lb-next{right:1rem}
 .lb-counter{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:0.65rem;letter-spacing:0.25em;color:var(--muted)}
 
-footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+/* CONTACT POPUP */
+.contact-popup{position:fixed;bottom:5rem;left:3rem;background:#161616;border:1px solid var(--border);padding:1.5rem 2rem;z-index:300;opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity 0.3s ease,transform 0.3s ease}
+.contact-popup.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.contact-popup p{font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem}
+.contact-popup a{font-size:0.85rem;color:var(--text);text-decoration:none;letter-spacing:0.05em;transition:color 0.3s}
+.contact-popup a:hover{color:var(--accent)}border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;margin-top:auto}
 .footer-links{display:flex;gap:1.5rem}
 .footer-links a{font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.3s}
 .footer-links a:hover{color:var(--accent)}
@@ -117,12 +122,16 @@ footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;justify
   <div class="photo-grid" id="grid"></div>
   <footer>
     <div class="footer-links">
-      <a href="#">Instagram</a>
-      <a href="#">500px</a>
-      <a href="#">Contact</a>
+      <a href="https://www.instagram.com/jungssup/" target="_blank">Instagram</a>
+      <a onclick="toggleContact()" style="cursor:pointer">Contact</a>
     </div>
     <span class="footer-copy">&copy; 2026</span>
   </footer>
+</div>
+
+<div class="contact-popup" id="contactPopup">
+  <p>Get in touch</p>
+  <a href="mailto:jungsup.kim17@gmail.com">jungsup.kim17@gmail.com</a>
 </div>
 
 <div class="lightbox" id="lightbox">
@@ -222,7 +231,17 @@ function closeLb(){
   const inner=lb.querySelector('.lightbox-inner');
   inner.style.opacity='0';
   inner.style.transform='scale(0.92)';
-  setTimeout(()=>lb.classList.remove('open'),350);
+  function toggleContact(){
+  document.getElementById('contactPopup').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  const popup=document.getElementById('contactPopup');
+  if(!popup.contains(e.target)&&e.target.textContent!=='Contact'){
+    popup.classList.remove('open');
+  }
+});
+
+setTimeout(()=>lb.classList.remove('open'),350);
 }
 
 function lbNav(dir){
