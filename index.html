@@ -9,7 +9,7 @@
 :root{--bg:#0a0a0a;--bg2:#111;--text:#e8e8e8;--muted:#666;--accent:#fff;--border:#222}
 body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;min-height:100vh;overflow-x:hidden}
 
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;opacity:0.045;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");background-size:128px 128px}
+#grain-canvas{position:fixed;inset:0;pointer-events:none;z-index:999;opacity:0.055}
 
 #transition{position:fixed;inset:0;background:#0a0a0a;z-index:500;pointer-events:none;opacity:0;transition:opacity 0.35s ease}
 
@@ -23,7 +23,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .page.active{display:flex}
 
 #home{flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 60%,#1a1a1a 0%,#0a0a0a 70%);z-index:0}
+#particle-canvas{position:absolute;inset:0;z-index:0;pointer-events:none}
 .hero-content{position:relative;z-index:1;padding:2rem}
 .hero-tagline{font-size:clamp(2rem,5vw,4rem);font-weight:200;letter-spacing:0.05em;line-height:1.2;color:var(--accent);margin-bottom:1rem}
 .hero-sub{font-size:0.85rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:3rem}
@@ -101,7 +101,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
   </div>
 </nav>
 
+<canvas id="grain-canvas"></canvas>
+
 <div class="page active" id="home">
+  <canvas id="particle-canvas"></canvas>
   <div class="hero-bg"></div>
   <div class="hero-content fade-in-el">
     <p class="hero-sub">Photography</p>
@@ -240,6 +243,60 @@ document.addEventListener('click',e=>{
     popup.classList.remove('open');
   }
 });
+
+// ANIMATED GRAIN
+const grainCanvas=document.getElementById('grain-canvas');
+const grainCtx=grainCanvas.getContext('2d');
+function resizeGrain(){grainCanvas.width=window.innerWidth;grainCanvas.height=window.innerHeight}
+resizeGrain();
+window.addEventListener('resize',resizeGrain);
+function animateGrain(){
+  const w=grainCanvas.width,h=grainCanvas.height;
+  const img=grainCtx.createImageData(w,h);
+  const d=img.data;
+  for(let i=0;i<d.length;i+=4){
+    const v=Math.random()*255|0;
+    d[i]=d[i+1]=d[i+2]=v;
+    d[i+3]=255;
+  }
+  grainCtx.putImageData(img,0,0);
+  requestAnimationFrame(animateGrain);
+}
+animateGrain();
+
+// PARTICLES
+const pCanvas=document.getElementById('particle-canvas');
+const pCtx=pCanvas.getContext('2d');
+function resizeParticles(){pCanvas.width=pCanvas.offsetWidth;pCanvas.height=pCanvas.offsetHeight}
+resizeParticles();
+window.addEventListener('resize',resizeParticles);
+
+const PARTICLE_COUNT=80;
+const particles=Array.from({length:PARTICLE_COUNT},()=>({
+  x:Math.random()*pCanvas.width,
+  y:Math.random()*pCanvas.height,
+  r:Math.random()*1.5+0.3,
+  vx:(Math.random()-0.5)*0.25,
+  vy:(Math.random()-0.5)*0.25,
+  o:Math.random()*0.4+0.1
+}));
+
+function animateParticles(){
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  particles.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0)p.x=pCanvas.width;
+    if(p.x>pCanvas.width)p.x=0;
+    if(p.y<0)p.y=pCanvas.height;
+    if(p.y>pCanvas.height)p.y=0;
+    pCtx.beginPath();
+    pCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    pCtx.fillStyle=`rgba(255,255,255,${p.o})`;
+    pCtx.fill();
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
 
 setTimeout(()=>lb.classList.remove('open'),350);
 }
