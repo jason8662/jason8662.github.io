@@ -344,7 +344,7 @@ function buildGrid(filter, instant = false) {
 function filterGallery(cat, btn) {
   currentFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); buildGrid(cat, true);
+  btn.classList.add('active'); buildGrid(cat, false); // false = use observer, not instant
 }
 
 function openLb(i) {
