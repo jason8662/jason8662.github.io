@@ -115,8 +115,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 .photo-item{
   break-inside:avoid;margin-bottom:8px;display:block;
   position:relative;overflow:hidden;cursor:pointer;background:var(--bg2);
-  opacity:0;transform:translateY(24px);
-  transition:opacity 0.55s ease,transform 0.55s ease
+  opacity:0;transform:translateY(28px);
+  transition:opacity 0.6s ease,transform 0.6s ease
 }
 .photo-item.visible{opacity:1;transform:translateY(0)}
 
@@ -299,24 +299,35 @@ async function loadFromCloudinary() {
   buildGrid(currentFilter);
 }
 
-// IntersectionObserver for scroll fade-in
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
-  });
-}, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+// IntersectionObserver — recreated each buildGrid so it resets properly
+let observer = null;
+
+function createObserver() {
+  if (observer) observer.disconnect();
+  observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+}
 
 function buildGrid(filter, instant = false) {
   const order = ['Macro', 'Travel', 'Long-exposure'];
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
+  createObserver(); // fresh observer so all items re-animate
+
   visible = photos
     .filter(p => filter === 'all' || p.cat.toLowerCase() === filter.toLowerCase())
     .sort((a, b) => order.indexOf(a.cat) - order.indexOf(b.cat));
+
   visible.forEach((p, i) => {
     const div = document.createElement('div'); div.className = 'photo-item';
-    // stagger delay for cascading effect
-    div.style.transitionDelay = instant ? '0ms' : `${i * 40}ms`;
+    // no transitionDelay — each item fades in independently as it enters viewport
+    div.style.transitionDelay = '0ms';
     if (instant) div.classList.add('visible');
     const img = document.createElement('img');
     img.alt = p.label; img.onload = () => img.classList.add('loaded'); img.src = p.src;
@@ -379,11 +390,18 @@ function showPage(id) {
     document.getElementById(id).classList.add('active');
     document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
     document.getElementById('nav-' + id).classList.add('active');
-    if (id === 'gallery') buildGrid(currentFilter);
+    if (id === 'gallery') buildGrid(currentFilter); // rebuilds + resets fade-in
     if (id === 'home') resizeP();
     window.scrollTo(0, 0); tr.style.opacity = '0';
   }, 300);
 }
+
+// Reset fade-in when tab becomes visible again
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && document.getElementById('gallery').classList.contains('active')) {
+    buildGrid(currentFilter);
+  }
+});
 
 function toggleContact() { document.getElementById('contactPopup').classList.toggle('open'); }
 document.addEventListener('click', e => {
